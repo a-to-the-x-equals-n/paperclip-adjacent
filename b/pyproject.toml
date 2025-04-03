@@ -1,10 +1,10 @@
 [project]
 name = "paperclip-adjacent"
 version = "0.1.0"
-dependencies = ["flask", "tinydb", "flask-cors", "pyyaml"]
+dependencies = ["flask", "tinydb", "flask-cors", "pyyaml", "python-dotenv"]
 
 [project.optional-dependencies]
-dev = ["pytest", "requests", "tempfile", "nox"]
+dev = ["pytest", "requests", "nox"]
 
 [tool.setuptools]
 packages = ["App"]

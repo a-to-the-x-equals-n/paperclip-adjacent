@@ -57,6 +57,7 @@ pip:
 
 dev:
 	$(call banner-i,INSTALLING IN EDITABLE MODE)
+	@pip install --upgrade setuptools
 	@pip install -e ".[dev]" 
 	$(call banner-o,DEV MODE ACTIVE (editable install))
 
@@ -84,22 +85,22 @@ clean: end-dev
 
 test-routes: 
 	$(call banner-i,RUNNING INTEGRATION TESTS)
-	@nox -s test_routes
+	@python -m nox -s test_routes
 	$(call banner-o,INTEGRATION TESTS COMPLETE)
 
 test-memcell: 
 	$(call banner-i,NOX INIT)
-	@nox -s test_memcell
+	@python -m nox -s test_memcell
 	$(call banner-o,COMPLETED)
 
 test-yamel: 
 	$(call banner-i,NOX INIT)
-	@nox -s test_yamel
+	@python -m nox -s test_yamel
 	$(call banner-o,COMPLETED)
 
 test: 
 	$(call banner-i,RUNNING PYTEST SUITE)
-	@nox -s test
+	@python -m nox -s test
 	$(call banner-o,PYTEST SUITE COMPLETE)
 
 # --- JENKINS ---
