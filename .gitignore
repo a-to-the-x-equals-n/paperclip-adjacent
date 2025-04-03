@@ -1,0 +1,70 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Visual Studio Code settings and workspace files
+.vscode/
+*.code-workspace
+
+# Virtual environments
+venv/
+.env/
+env/
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+
+# Logs and temporary files
+*.log
+*.tmp
+*.swp
+*.swo
+
+# Cache files
+.cache/
+__pypackages__/
+
+# Pytest and coverage reports
+htmlcov/
+.coverage
+*.cover
+*.py,cover
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.hypothesis/
+
+# MyPy type checking reports
+.mypy_cache/
+.dmypy.json
+.pyre/
+
+# Jupyter Notebook temporary files
+*.ipynb~  # Auto-saved versions
+
+# Ignore compiled Cython files
+*.c
+*.o
+*.pyd
+
+# Ignore MacOS system files
+.DS_Store
+
+# Ignore Windows system files
+Thumbs.db
+desktop.ini
+
+hidden/
+hide/
+n.txt
+target/
