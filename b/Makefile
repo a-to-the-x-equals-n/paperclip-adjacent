@@ -66,9 +66,9 @@ run:
 	$(call banner-o,SERVER STOPPED)
 
 tree:
-	$(call banner-i,PROJECT STRUCTURE)
+	$(call banner-i,BUILDING TREEHOUSE)
 	@tree -C -L $(DEPTH) -I '__pycache__|*.py[co]|*.sw?|.DS_Store|.git|node_modules|hidden|build|dist|*.egg-info'
-	$(call banner-o,FINISHED)
+	$(call banner-o,TREE BUILT)
 
 end-dev:
 	$(call banner-i,UNINSTALLING EDITABLE PACKAGE)
