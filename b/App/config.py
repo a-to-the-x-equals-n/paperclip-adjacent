@@ -7,18 +7,18 @@ from App import LOG
 
 try:
     EMAIL, PW, PHONE, IP, PORT, PIN, TABLE, PATH = dog.fetch(
-        dog.where, 'MAIL', 'PW', 'PHONE', 'IP', 'PORT', 'PIN', 'TABLE', 'PATH'
+        dog.where, 'MAIL', 'PW', 'PHONE', 'IP', 'PORT', 'PIN', 'TABLE', 'DB_PATH'
     )
 except FileNotFoundError:
     try:
         dir = dog.where_is_it_boy('.env', mode = 'parent')
         EMAIL, PW, PHONE, IP, PORT, PIN, TABLE, PATH = dog.fetch(
-            dog.where, 'MAIL', 'PW', 'PHONE', 'IP', 'PORT', 'PIN', 'TABLE', 'PATH'
+            dog.where, 'MAIL', 'PW', 'PHONE', 'IP', 'PORT', 'PIN', 'TABLE', 'DB_PATH'
         )
     except FileNotFoundError:
         dir = Path.cwd() / Path('App')
         EMAIL, PW, PHONE, IP, PORT, PIN, TABLE, PATH = dog.fetch(
-            dir, 'MAIL', 'PW', 'PHONE', 'IP', 'PORT', 'PIN', 'TABLE', 'PATH'
+            dir, 'MAIL', 'PW', 'PHONE', 'IP', 'PORT', 'PIN', 'TABLE', 'DB_PATH'
         )
         
 

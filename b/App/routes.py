@@ -1,5 +1,6 @@
 from flask import request, jsonify
 from .config import LOG, db, app
+import os
 
 @app.route('/ping', methods = ['GET'])
 def pong():

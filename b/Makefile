@@ -6,7 +6,7 @@ SHELLFLAGS := -eu -o pipefail -c
 
 PY = python
 PROJECT = $(shell grep -m 1 '^name =' pyproject.toml | cut -d '"' -f 2)
-DEPTH = 3
+DEPTH = 4
 
 WH_BG = 47
 BU = 94
@@ -37,7 +37,7 @@ run:
 
 tree:
 	@echo "$(TX_IN)- PROJECT STRUCTURE -$(R)"
-	@tree -C -L $(DEPTH) -I '__pycache__|*.py[co]|*.sw?|.DS_Store|.git|node_modules|hidden|build|dist|*.egg-info|*.yaml'
+	@tree -C -L $(DEPTH) -I '__pycache__|*.py[co]|*.sw?|.DS_Store|.git|node_modules|hidden|build|dist|*.egg-info'
 	@echo "$(TX_OUT)- FINISHED -$(R)"
 
 
@@ -57,20 +57,24 @@ clean: end-dev
 
 test-routes: dev
 	@echo "$(TX_IN)- RUNNING INTEGRATION TESTS -$(R)"
-	@nox -s integration
+	@nox -s test_routes
 	@echo "$(TX_OUT)- INTEGRATION TESTS COMPLETE -$(R)"
 
 test-memcell: dev
 	@echo "$(TX_IN)- NOX INIT -$(R)"
-	nox -s test_memcell
+	@nox -s test_memcell
 	@echo "$(TX_OUT)- COMPLETED -$(R)"
 
 test-yamel: dev
 	@echo "$(TX_IN)- NOX INIT -$(R)"
-	nox -s test_yamel
+	@nox -s test_yamel
 	@echo "$(TX_OUT)- COMPLETED -$(R)"
 
-
+test: dev
+	@echo "$(TX_IN)- RUNNING PYTEST SUITE -$(R)"
+	@nox -s test
+	@echo "$(TX_OUT)- PYTEST SUITE COMPLETE -$(R)"
+	
 # --- JENKINS ---
 
 jenkins-start:
