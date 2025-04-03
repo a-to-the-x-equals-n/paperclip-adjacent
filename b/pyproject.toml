@@ -4,7 +4,7 @@ version = "0.1.0"
 dependencies = ["flask", "tinydb", "flask-cors", "pyyaml"]
 
 [project.optional-dependencies]
-dev = ["pytest", "requests", "tempfile"]
+dev = ["pytest", "requests", "tempfile", "nox"]
 
 [tool.setuptools]
 packages = ["App"]
