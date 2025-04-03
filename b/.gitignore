@@ -1,0 +1,55 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+venv/
+.env/
+*.env
+*.venv
+Pipfile.lock
+poetry.lock
+
+# Python package files
+*.egg
+*.egg-info/
+dist/
+build/
+*.whl
+
+# VS Code settings
+.vscode/
+*.code-workspace
+
+# Logs and debug files
+*.log
+debug.log
+coverage/
+*.cover
+*.coveragerc
+.coverage
+.tox/
+nosetests.xml
+pytest_cache/
+hypothesis/
+
+# YAML files (if not meant to be committed)
+*.yaml
+*.yml
+
+# Ignore local databases
+*.sqlite3
+*.db
+
+# Ignore personal Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Hidden directories
+hidden/
+hide/
+.env
