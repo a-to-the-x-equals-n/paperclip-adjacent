@@ -1,98 +1,132 @@
 SHELL := /bin/bash
 SHELLFLAGS := -eu -o pipefail -c
 
+.SILENT:
 .ONESHELL:
-.PHONY: pip dev end-dev run tree clean test
+.PHONY: pip dev end-dev run tree clean test \
+        test-routes test-memcell test-yamel \
+        jenkins jenkins-start jenkins-stop jenkins-restart jenkins-status jenkins-browser
 
 PY = python
 PROJECT = $(shell grep -m 1 '^name =' pyproject.toml | cut -d '"' -f 2)
 DEPTH = 4
 
-WH_BG = 47
 BU = 94
 YW = 93
 GR = 92
-TX_IN = $(shell printf '\033[1;$(YW);$(WH_BG)m')
-TX_OUT = $(shell printf '\033[1;$(GR);$(WH_BG)m')
-R = $(shell printf '\033[0m')
+MG = 35
+PR = 38;5;129
 
+I = $(shell printf '\033[1;$(MG)m')   # magenta
+O = $(shell printf '\033[1;$(PR)m')   # purple
+R = $(shell printf '\033[0m')         # reset
 
-# --- TARGETS ---
+# --- BANNERS ---
+
+define banner-i
+	@PHRASE="$(1)"; \
+	WIDTH=$$(tput cols); \
+	PHRASE_LEN=$${#PHRASE}; \
+	PAD=$$(( (WIDTH - PHRASE_LEN - 2) / 2 )); \
+	LEFT=$$(printf "%*s" "$$PAD" ""); \
+	RIGHT=$$(printf "%*s" "$$PAD" ""); \
+	LINE="$${LEFT// /=} $$PHRASE $${RIGHT// /=}"; \
+	LINE=$${LINE:3:$$(( $${#LINE} - 4 ))}; \
+	echo "$(I)$${LINE}$(R)"
+endef
+
+define banner-o
+	@PHRASE="$(1)"; \
+	WIDTH=$$(tput cols); \
+	PHRASE_LEN=$${#PHRASE}; \
+	PAD=$$(( (WIDTH - PHRASE_LEN - 2) / 2 )); \
+	LEFT=$$(printf "%*s" "$$PAD" ""); \
+	RIGHT=$$(printf "%*s" "$$PAD" ""); \
+	LINE="$${LEFT// /=} $$PHRASE $${RIGHT// /=}"; \
+	LINE=$${LINE:3:$$(( $${#LINE} - 4 ))}; \
+	echo "$(O)$${LINE}$(R)"
+endef
+
+test-banner:
+	$(call banner-i,TEST LINE)
 
 pip: 
-	@echo "$(TX_IN)- INSTALLING DEPENDENCIES -$(R)"
+	$(call banner-i,INSTALLING DEPENDENCIES)
 	@pip install .
-	@echo "$(TX_OUT)- DEPENDENCIES INSTALLED-$(R)"
+	$(call banner-o,DEPENDENCIES INSTALLED)
 
 dev:
-	@echo "$(TX_IN)- INSTALLING IN EDITABLE MODE -$(R)"
+	$(call banner-i,INSTALLING IN EDITABLE MODE)
 	@pip install -e ".[dev]" 
-	@echo "$(TX_OUT)- DEV MODE ACTIVE (editable install) -$(R)"
+	$(call banner-o,DEV MODE ACTIVE (editable install))
 
 run:
-	@echo "$(TX_IN)- STARTING DEV SERVER -$(R)"
+	$(call banner-i,STARTING DEV SERVER)
 	@$(PY) -m App --log WARNING --tail 
-	@echo "$(TX_OUT)- SERVER STOPPED -$(R)"
-
+	$(call banner-o,SERVER STOPPED)
 
 tree:
-	@echo "$(TX_IN)- PROJECT STRUCTURE -$(R)"
+	$(call banner-i,PROJECT STRUCTURE)
 	@tree -C -L $(DEPTH) -I '__pycache__|*.py[co]|*.sw?|.DS_Store|.git|node_modules|hidden|build|dist|*.egg-info'
-	@echo "$(TX_OUT)- FINISHED -$(R)"
-
-
+	$(call banner-o,FINISHED)
 
 end-dev:
-	@echo "$(TX_IN)- UNINSTALLING EDITABLE PACKAGE -$(R)"
+	$(call banner-i,UNINSTALLING EDITABLE PACKAGE)
 	@pip uninstall -y $(PROJECT) || true
-	@echo "$(TX_OUT)- DEV MODE DISABLED -$(R)"
+	$(call banner-o,DEV MODE DISABLED)
 
 clean: end-dev
-	@echo "$(TX_IN)- CLEANING BUILD ARTIFACTS -$(R)"
+	$(call banner-i,CLEANING BUILD ARTIFACTS)
 	@rm -rf build/ dist/ *.egg-info/ .pytest_cache/ __pycache__/ .nox/ .mypy_cache
-	@echo "$(TX_OUT)- CLEANED -$(R)"
-
+	$(call banner-o,CLEANED)
 
 # --- NOX ---
 
-test-routes: dev
-	@echo "$(TX_IN)- RUNNING INTEGRATION TESTS -$(R)"
+test-routes: 
+	$(call banner-i,RUNNING INTEGRATION TESTS)
 	@nox -s test_routes
-	@echo "$(TX_OUT)- INTEGRATION TESTS COMPLETE -$(R)"
+	$(call banner-o,INTEGRATION TESTS COMPLETE)
 
-test-memcell: dev
-	@echo "$(TX_IN)- NOX INIT -$(R)"
+test-memcell: 
+	$(call banner-i,NOX INIT)
 	@nox -s test_memcell
-	@echo "$(TX_OUT)- COMPLETED -$(R)"
+	$(call banner-o,COMPLETED)
 
-test-yamel: dev
-	@echo "$(TX_IN)- NOX INIT -$(R)"
+test-yamel: 
+	$(call banner-i,NOX INIT)
 	@nox -s test_yamel
-	@echo "$(TX_OUT)- COMPLETED -$(R)"
+	$(call banner-o,COMPLETED)
 
-test: dev
-	@echo "$(TX_IN)- RUNNING PYTEST SUITE -$(R)"
+test: 
+	$(call banner-i,RUNNING PYTEST SUITE)
 	@nox -s test
-	@echo "$(TX_OUT)- PYTEST SUITE COMPLETE -$(R)"
-	
+	$(call banner-o,PYTEST SUITE COMPLETE)
+
 # --- JENKINS ---
 
+jenkins-browser:
+	$(call banner-i,NAVIGATING TO DASHBOARD)
+	@powershell.exe start http://localhost:8080/
+	$(call banner-o,DASHBOARD CLOSED)
+
 jenkins-start:
-	@echo "$(TX_IN)- STARTING JENKINS -$(R)"
-	sudo service jenkins start
-	@echo "$(TX_OUT)- JENKINS STARTED -$(R)"
+	$(call banner-i,STARTING JENKINS SERVER)
+	@sudo service jenkins start
+	$(call banner-o,JENKINS STARTED)
+
+jenkins: jenkins-start jenkins-browser
 
 jenkins-stop:
-	@echo "$(TX_IN)- STOPPING JENKINS -$(R)"
-	sudo service jenkins stop
-	@echo "$(TX_OUT)- JENKINS STOPPED -$(R)"
+	$(call banner-i,SHUTTING DOWN JENKINS)
+	@sudo service jenkins stop
+	$(call banner-o,JENKINS OFFLINE)
 
 jenkins-restart:
-	@echo "$(TX_IN)- RESTARTING JENKINS -$(R)"
-	sudo service jenkins restart
-	@echo "$(TX_OUT)- JENKINS RESTARTED -$(R)"
+	$(call banner-i,RESTARTING JENKINS)
+	@sudo service jenkins restart
+	$(call banner-o,JENKINS RESTARTED)
 
 jenkins-status:
-	@echo "$(TX_IN)- JENKINS STATUS -$(R)"
-	sudo service jenkins status
-	@echo "$(TX_OUT)- STATUS CHECK COMPLETE -$(R)"
+	$(call banner-i,JENKINS STATUS)
+	@sudo service jenkins status
+	$(call banner-o,STATUS CHECK COMPLETE)

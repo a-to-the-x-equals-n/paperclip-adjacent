@@ -21,7 +21,6 @@ except FileNotFoundError:
             dir, 'MAIL', 'PW', 'PHONE', 'IP', 'PORT', 'PIN', 'TABLE', 'DB_PATH'
         )
         
-
 db = Yamel(path = PATH, tb = TABLE, PIN = PIN)
 app = Flask(__name__)
 CORS(app) 
