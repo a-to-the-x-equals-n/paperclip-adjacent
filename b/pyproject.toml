@@ -13,7 +13,7 @@ packages = ["App"]
 junit_family = "xunit2"
 junit_suite_name = "pytest"
 junit_logging = "all"
-addopts = "--junit-xml=tests/results/results.xml"
+addopts = "--junit-xml=tests/results/*.xml"
 
 [build-system]
 requires = ["setuptools>=61.0"]

@@ -9,6 +9,7 @@ from App.models.db.memcell import memcell
     ('Missing user', lambda: memcell(id=4, task='Take out trash')),
     ('Missing task', lambda: memcell(id=5, user='ellen@example.com')),
 ])
+
 def test_memcell_cases(label, builder):
     if "Missing" in label or "too long" in label:
         with pytest.raises(Exception):

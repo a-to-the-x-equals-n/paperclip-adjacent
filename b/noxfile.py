@@ -33,7 +33,7 @@ def test_memcell(session):
     Run only memcell tests.
     '''
     _prepare_env(session)
-    session.run("pytest", "tests/test_memcell.py")
+    session.run("pytest", "tests/test_memcell.py", "--junit-xml=tests/results/memcell.xml")
 
 
 @nox.session
@@ -42,7 +42,7 @@ def test_yamel(session):
     Run only Yamel tests.
     '''
     _prepare_env(session)
-    session.run("pytest", "tests/test_yamel.py")
+    session.run("pytest", "tests/test_yamel.py", "--junit-xml=tests/results/yamel.xml")
 
 
 @nox.session
@@ -51,4 +51,4 @@ def test_routes(session):
     Run only integration tests for Flask routes.
     '''
     _prepare_env(session)
-    session.run("pytest", "tests/test_routes.py")
+    session.run("pytest", "tests/test_routes.py", "--junit-xml=tests/results/routes.xml")
