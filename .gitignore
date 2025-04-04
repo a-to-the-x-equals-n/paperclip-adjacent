@@ -69,3 +69,5 @@ hide/
 n.txt
 target/
 .docs/
+results/
+results/*

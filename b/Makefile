@@ -55,15 +55,9 @@ pip:
 	@pip install .
 	$(call banner-o,DEPENDENCIES INSTALLED)
 
-dev:
-	$(call banner-i,INSTALLING IN EDITABLE MODE)
-	@pip install --upgrade setuptools
-	@pip install -e ".[dev]" 
-	$(call banner-o,DEV MODE ACTIVE (editable install))
-
 run:
 	$(call banner-i,STARTING DEV SERVER)
-	@$(PY) -m App --log WARNING --tail 
+	@$(PY) -m App --log info --tail 
 	$(call banner-o,SERVER STOPPED)
 
 tree:
@@ -102,6 +96,12 @@ test:
 	$(call banner-i,RUNNING PYTEST SUITE)
 	@python -m nox -s test
 	$(call banner-o,PYTEST SUITE COMPLETE)
+
+bootstrap: 
+	$(call banner-i,BOOTSTRAPPING ENVIRONMENT)
+	@pip install --upgrade pip setuptools wheel
+	@pip install -e ".[dev]"
+	$(call banner-o,BOOTSTRAP COMPLETE)
 
 
 # --- JENKINS ---
