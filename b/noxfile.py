@@ -6,7 +6,7 @@ from pathlib import Path
 HOST = 'localhost'
 PORT = '8007'
 BASE = f'http://{HOST}:{PORT}'
-DIR = Path("b/tests/results")
+DIR = Path("tests/results")
 
 
 def _prepare_env(session):

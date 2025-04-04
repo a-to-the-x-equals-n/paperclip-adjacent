@@ -12,12 +12,11 @@ packages = ["App"]
 [tool.pytest.ini_options]
 junit_family = "xunit2"
 junit_suite_name = "pytest"
-testpaths = ["b/tests"]
 junit_logging = "all"
-addopts = "--junit-xml=b/tests/results/results.xml"
+addopts = "--junit-xml=tests/results/results.xml"
 
 [build-system]
-requires = ["setuptools"]
+requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 # --- CLI COMMANDS ---
