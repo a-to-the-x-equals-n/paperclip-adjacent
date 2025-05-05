@@ -3,7 +3,9 @@ from collections.abc import Mapping
 
 class memcell(Mapping):
     '''Memcell factory for typecasting-like behavior.'''
-    def __init__(self, data: dict[str, Any] | None = None, /, *, id: int | None = None, user: str | None = None, task: str | None = None, status: str = 'pending') -> None:
+    __slots__ = ['id', 'phone', 'task', 'status', '_data']
+
+    def __init__(self, data: dict[str, Any] | None = None, /, *, id: int | None = None, phone: str | None = None, task: str | None = None, status: str = 'pending') -> None:
         '''
         Initialize a memcell from a dictionary or keyword arguments.
 
@@ -15,8 +17,8 @@ class memcell(Mapping):
         id : int
             Unique ID of the memcell.
 
-        user : str
-            Owner's user ID or email.
+        phone : str
+            Owner's phone or email.
 
         task : str
             Task description (max 100 characters).
@@ -26,7 +28,7 @@ class memcell(Mapping):
         '''
         if data:
             id = data.get('id')
-            user = data.get('user')
+            phone = data.get('phone')
             task = data.get('task')
             status = data.get('status', 'pending')
 
@@ -34,17 +36,17 @@ class memcell(Mapping):
             raise ValueError('Task description exceeds 100 characters.')
 
         assert id is not None, 'memcell.id cannot be NONE'
-        assert user is not None, 'memcell.user cannot be NONE'
+        assert phone is not None, 'memcell.phone cannot be NONE'
         assert task is not None, 'memcell.task cannot be NONE'
         
         self.id = id
-        self.user = user
+        self.phone = phone
         self.task = task
         self.status = status
 
         self._data = {
             'id': self.id,
-            'user': self.user,
+            'phone': self.phone,
             'task': self.task,
             'status': self.status
         }
@@ -71,7 +73,7 @@ class memcell(Mapping):
         '''
         task = self._data['task']
         t = f"{task[:25]}..." if len(task) > 25 else task
-        return f"\nmemcell:\n  id: '{self.id}'\n  user: '{self.user}'\n  status: '{self.status}'\n  task: '{t}'"
+        return f"\nmemcell:\n  id: '{self.id}'\n  phone: '{self.phone}'\n  status: '{self.status}'\n  task: '{t}'"
 
     def __getitem__(self, key: str) -> Any:
         '''
@@ -122,29 +124,30 @@ class memcell(Mapping):
         '''
         return dict(self)
 
+__all__ = ['memcell']
 
 if __name__ == '__main__':
     tests = [
         # valid
-        ('Valid memcell from kwargs', lambda: memcell(id=1, user='alice@example.com', task='Feed the dog')),
+        ('Valid memcell from kwargs', lambda: memcell(id=1, phone='alice@example.com', task='Feed the dog')),
         
         # valid - from dict
-        ('Valid memcell from dict', lambda: memcell({'id': 2, 'user': 'bob@example.com', 'task': 'Buy groceries'})),
+        ('Valid memcell from dict', lambda: memcell({'id': 2, 'phone': 'bob@example.com', 'task': 'Buy groceries'})),
 
         # invalid - task too long
-        ('Task too long', lambda: memcell(id=3, user='carol@example.com', task='a' * 101)),
+        ('Task too long', lambda: memcell(id=3, phone='carol@example.com', task='a' * 101)),
 
         # invalid - missing id
-        ('Missing ID', lambda: memcell(user='dave@example.com', task='Take out trash')),
+        ('Missing ID', lambda: memcell(phone='dave@example.com', task='Take out trash')),
 
-        # invalid - missing user
-        ('Missing user', lambda: memcell(id=4, task='Take out trash')),
+        # invalid - missing phone
+        ('Missing phone', lambda: memcell(id=4, task='Take out trash')),
 
         # invalid - missing task
-        ('Missing task', lambda: memcell(id=5, user='ellen@example.com')),
+        ('Missing task', lambda: memcell(id=5, phone='ellen@example.com')),
 
         # valid - test __call__ and dict conversion
-        ('Dict and call output', lambda: print(dict(memcell(id=6, user='frank@example.com', task='Email client'))))
+        ('Dict and call output', lambda: print(dict(memcell(id=6, phone='frank@example.com', task='Email client'))))
     ]
 
     for label, test in tests:

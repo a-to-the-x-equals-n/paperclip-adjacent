@@ -7,7 +7,7 @@ dependencies = ["flask", "tinydb", "flask-cors", "pyyaml", "python-dotenv"]
 dev = ["pytest", "requests", "nox"]
 
 [tool.setuptools]
-packages = ["App"]
+packages = ["api"]
 
 [tool.pytest.ini_options]
 junit_family = "xunit2"
@@ -21,4 +21,4 @@ build-backend = "setuptools.build_meta"
 
 # --- CLI COMMANDS ---
 [project.scripts]
-paperclip = "App.__main__:main"
+paperclip = "api.__main__:main"

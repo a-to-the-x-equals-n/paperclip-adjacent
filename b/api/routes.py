@@ -1,6 +1,6 @@
 from flask import request, jsonify
-from .config import LOG, db, app
-import os
+from .config import db, app
+from api.utils.debuggernaut import heimdahl, laufeyspawn, jotunbane
 
 @app.route('/ping', methods = ['GET'])
 def pong():
@@ -16,6 +16,7 @@ def root():
         'status': 'OK'
     }), 200
 
+@laufeyspawn(summoned = False)
 @app.route('/memcells', methods = ['GET'])
 def get_all_memcells():
     '''
@@ -25,10 +26,10 @@ def get_all_memcells():
     -------
     JSON response containing all memcells.
     '''
-    LOG.debug('GET /memcells called')
+    heimdahl('GET /memcells called', unveil = True, threat = 1)
     return jsonify([dict(cell) for cell in db.all])
 
-
+@laufeyspawn(summoned = False)
 @app.route('/memcells', methods = ['POST'])
 def create_memcell():
     '''
@@ -40,21 +41,21 @@ def create_memcell():
     -------
     JSON response with inserted doc_id or error message.
     '''
-    LOG.debug('POST /memcells called')
+    heimdahl('POST /memcells called', unveil = True, threat = 1)
     data = request.get_json()
 
     try:
-        user = data['user']
+        phone = data['phone']
         task = data['task']
-        doc_id = db.create(user, task)
-        LOG.info(f'Created memcell: doc_id = {doc_id}')
-        return jsonify({'doc_id': doc_id}), 201
+        memcell = db.create(phone, task)
+        heimdahl(f'[NEW MEMCELL] id: {memcell["id"]}', unveil = jotunbane, threat = 1)
+        return jsonify({'created': memcell}), 201
 
     except Exception as e:
-        LOG.error(f'Failed to create memcell: {e}')
+        heimdahl(f'[CREATION ERROR] {e}', unveil = True, threat = 3)
         return jsonify({'error': str(e)}), 400
 
-
+@laufeyspawn(summoned = False)
 @app.route('/memcells/<int:mem_id>', methods = ['GET'])
 def get_memcell(mem_id: int):
     '''
@@ -69,17 +70,17 @@ def get_memcell(mem_id: int):
     -------
     JSON response with the memcell or error message.
     '''
-    LOG.debug(f'GET /memcells/{mem_id} called')
+    heimdahl(f'GET /memcells/{mem_id} called')
     matches = db.where({'id': mem_id})
 
     if not matches:
-        LOG.warning(f'Memcell not found: id = {mem_id}')
-        return jsonify({'error': 'Memcell not found'}), 404
+        heimdahl(f'[FIND ERROR] {mem_id}', unveil = jotunbane, threat = 2)
+        return jsonify({'error': 'Memcell not found'}), 404, {'Content-Type': 'application/json'}
 
-    LOG.info(f'Retrieved memcell: id = {mem_id}')
+    heimdahl(f'[RETRIEVED] {mem_id}', unveil = jotunbane, threat = 1)
     return jsonify(dict(matches[0]))
 
-
+@laufeyspawn(summoned = False)
 @app.route('/memcells/<int:mem_id>', methods = ['DELETE'])
 def delete_memcell(mem_id: int):
     '''
@@ -94,17 +95,17 @@ def delete_memcell(mem_id: int):
     -------
     JSON response with deletion status.
     '''
-    LOG.debug(f'DELETE /memcells/{mem_id} called')
-    deleted = db.delete({'id': mem_id})
+    heimdahl(f'DELETE /memcells/{mem_id} called', unveil = True, threat = 1)
+    cell = db.delete({'id': mem_id})
 
-    if deleted == 0:
-        LOG.warning(f'No memcell deleted: id = {mem_id}')
-        return jsonify({'error': 'Nothing deleted'}), 404
+    if cell['id'] == -1:
+        heimdahl(f'[DELETION ERROR] {mem_id}', unveil = True, threat = 3)
+        return jsonify({'error': 'Nothing deleted'}), 404, {'Content-Type': 'application/json'}
 
-    LOG.info(f'Memcell deleted: id = {mem_id}')
-    return jsonify({'deleted': deleted})
+    heimdahl(f'[DEL MEMCELL] id: {cell["id"]}', unveil = jotunbane, threat = 1)
+    return jsonify({'deleted': cell})
 
-
+@laufeyspawn(summoned = False)
 @app.route('/memcells/<int:mem_id>', methods = ['PUT'])
 def update_memcell(mem_id: int):
     '''
@@ -119,13 +120,13 @@ def update_memcell(mem_id: int):
     -------
     JSON response with update status.
     '''
-    LOG.debug(f'PUT /memcells/{mem_id} called')
+    heimdahl(f'PUT /memcells/{mem_id} called', unveil = True, threat = 1)
     data = request.get_json()
     updated = db.update(data, {'id': mem_id})
 
     if updated == 0:
-        LOG.warning(f'No memcell updated: id = {mem_id}')
-        return jsonify({'error': 'No memcell updated'}), 404
+        heimdahl(f'[UPDATE ERROR] {mem_id}', unveil = True, threat = 3)
+        return jsonify({'error': 'No memcell updated'}), 404, {'Content-Type': 'application/json'}
 
-    LOG.info(f'Memcell updated: id = {mem_id}')
+    heimdahl(f'[UPDATED] {mem_id}', unveil = jotunbane, threat = 1)
     return jsonify({'updated': updated})

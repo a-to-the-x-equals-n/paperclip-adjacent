@@ -5,6 +5,8 @@ class YStorage(Storage):
     '''
     TinyDB-compatible storage that reads/writes YAML.
     '''
+    __slots__ = ['_path']
+    
     def __init__(self, path: str):
         self._path = path
 
@@ -23,7 +25,8 @@ class YStorage(Storage):
             with open(self._path, 'r') as f:
                 return yaml.safe_load(f) or {}
         except FileNotFoundError:
-            return {}
+            # return {}
+            raise FileNotFoundError(f'filepath: {self._path}')
 
     def write(self, data: dict[str, object]) -> None:
         '''

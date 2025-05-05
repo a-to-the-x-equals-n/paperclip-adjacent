@@ -91,9 +91,6 @@ class Cache(type):
             raise AttributeError(f"\n\n\t\"I'm sorry Dave. I'm afraid I can't let you access '{name}'.\"\n\t\t   - HAL 9000\n")
         return super().__getattribute__(name)
 
-########################
-#  - GOODDOG CLASS -   #
-########################
 class GoodDog(metaclass = Cache):
     _I_AM_GROOT: ClassVar[bool]
     _WHERE_AM_I: ClassVar[_PathLike]
@@ -112,7 +109,6 @@ class GoodDog(metaclass = Cache):
         dir = Path(__file__).resolve().parent if '__file__' in globals() else Path.cwd()
         return dir
 
-        
     @staticmethod
     def _root_caller_dir()-> Path:
         '''
@@ -221,7 +217,7 @@ class GoodDog(metaclass = Cache):
             raise FileNotFoundError(f"\n\n\t\"I'm sorry Dave. I'm afraid I can't find the '{env}' file in '{dir}'.\"\n\t\t - HAL 9000\n")
 
         try:
-            load_dotenv(env)  # cache the `.env` file
+            load_dotenv(env, override = True)  # cache the `.env` file
         except Exception as e:
             print(f'Error: {str(e)}')
             raise RuntimeError(f"\n\n\t\"I'm sorry Dave. I'm afraid I recieved an error loading the `.env` file.\"\n\t\t - HAL 9000\n")
@@ -258,3 +254,5 @@ class GoodDog(metaclass = Cache):
             return fpath
         if mode == 'parent':
             return fpath.parent
+
+__all__ = ['GoodDog']

@@ -2,15 +2,16 @@ from tinydb import TinyDB, Query
 from tinydb.queries import QueryInstance
 from .ystore import YStorage
 from .memcell import memcell
-from .singlemeta import Highlander
+from api.utils import Highlander
+from api.utils.debuggernaut import heimdahl, laufeyspawn, jotunbane
 
 class Yamel(metaclass = Highlander):
     
-    __slots__ = ('_db', '_query', '_ids', '_PIN')
-
+    __slots__ = ('_db', '_query', '_ids')
     _MAX_CELLS = 10
 
-    def __init__(self, /, *, path: str | None = None, tb : str | None = None, PIN: str | None = None) -> None:
+    @laufeyspawn(summoned = True)
+    def __init__(self, /, *, path: str | None = None, tb : str | None = None) -> None:
         '''
         Initialize the TinyDB instance with YAML storage.
 
@@ -19,7 +20,6 @@ class Yamel(metaclass = Highlander):
         path : str
             Path to the YAML database file.
         '''
-        assert PIN is not None, 'PIN cannot be NONE'
         assert tb is not None, 'tb cannot be None'
         assert path is not None, 'path cannot be None'
 
@@ -27,7 +27,7 @@ class Yamel(metaclass = Highlander):
         self._db = db.table(tb)
         self._query = Query()
         self._ids = self._available_ids()
-        self._PIN = PIN
+        heimdahl(f'[INIT YAMEL] ', unveil = jotunbane, threat = 2)
 
     @property
     def next_id(self) -> int:
@@ -41,12 +41,26 @@ class Yamel(metaclass = Highlander):
         '''
         if not self._available_ids():
             return -1
-        
+
         try:
             return self._ids.pop(0)
         except IndexError:
             return 1
     
+    @property
+    def all(self) -> list[dict[str, object]]:
+        '''
+        Fetch all records from the database.
+
+        Returns:
+        -------
+        list
+            All stored records.
+        '''
+        results = self._db.all()
+        return sorted([memcell(doc) for doc in results], key = lambda d: d['id'])
+    
+    @laufeyspawn(summoned = False)
     def _available_ids(self) -> list[int]:
         '''
         Find all unused IDs from 1 to cls._max_cells.
@@ -58,9 +72,8 @@ class Yamel(metaclass = Highlander):
         '''
         used = {cell['id'] for cell in self.all if 'id' in cell}
         return sorted([i for i in range(1, self.__class__._MAX_CELLS + 1) if i not in used])
-
-    # --- CRUD OPERATIONS ---
-
+    
+    @laufeyspawn(summoned = False)
     def clear(self) -> None:
         '''
         Prompt for a 4-digit PIN before wiping all records from the database.
@@ -78,26 +91,14 @@ class Yamel(metaclass = Highlander):
         self._db.truncate()
         print('[DELETED]')
 
-    @property
-    def all(self) -> list[dict[str, object]]:
-        '''
-        Fetch all records from the database.
-
-        Returns:
-        -------
-        list
-            All stored records.
-        '''
-        results = self._db.all()
-        return [memcell(doc) for doc in results]
-    
-    def create(self, user: str, task: str) -> int | str:
+    @laufeyspawn(summoned = True)
+    def create(self, phone: str, task: str) -> int | str:
         '''
         Create a memcell with auto-assigned ID from available pool.
 
         Parameters:
         ----------
-        user : str
+        phone : str
             Owner of the task.
 
         task : str
@@ -112,9 +113,12 @@ class Yamel(metaclass = Highlander):
         if mem_id < 0:
             raise RuntimeError('No memcell slots available (max = 10).')
 
-        cell = memcell(id = mem_id, user = user, task = task, status = 'pending')
-        return self._db.insert(cell)
+        cell = memcell(id = mem_id, phone = phone, task = task, status = 'pending')
+        self._db.insert(cell)
+        cell = {k: cell[k] for k in ('id', 'task')}
+        return cell
 
+    @laufeyspawn(summoned = True)
     def where(self, filters: dict[str, object]) -> list[dict[str, object]]:
         '''
         Fetch records that match given filters.
@@ -133,6 +137,7 @@ class Yamel(metaclass = Highlander):
         results = self._db.search(q)
         return [memcell(doc) for doc in results]
 
+    @laufeyspawn(summoned = True)
     def update(self, updates: dict[str, object], filters: dict[str, object]) -> int:
         '''
         Update matching records with new data.
@@ -153,6 +158,7 @@ class Yamel(metaclass = Highlander):
         q = self._build_query(filters)
         return self._db.update(updates, q)
 
+    @laufeyspawn(summoned = True)
     def delete(self, filters: dict[str, object]) -> int:
         '''
         Delete memcells matching filters and reclaim their IDs.
@@ -167,16 +173,19 @@ class Yamel(metaclass = Highlander):
         int
             Number of records deleted.
         '''
-        matching = self.where(filters)
-        for cell in matching:
-            if 'id' in cell:
-                self._ids.append(cell['id'])
+        cell = {}
+        matches = self.where(filters)
+        if not matches:
+            return -1
 
-        self._ids.sort()
-        q = self._build_query(filters)
-        return self._db.remove(q)
-    
-    # --- QUERY BUILD HELPER ---
+        cell['id'] = matches[0].get('id', -1)
+        cell['task'] = matches[0].get('task', -1)
+        if cell['id'] != -1:
+            self._ids.append(cell['id'])
+            self._ids.sort()
+
+        self._db.remove(self._build_query(filters))
+        return cell
 
     def _build_query(self, filters: dict[str, object]) -> QueryInstance:
         '''
@@ -198,7 +207,7 @@ class Yamel(metaclass = Highlander):
             q = condition if q is None else q & condition
         return q
 
-
+__all__ = ['Yamel']
 
 if __name__ == '__main__':
     yam = Yamel()
