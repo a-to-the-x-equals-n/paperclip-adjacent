@@ -56,6 +56,23 @@ pub async fn delete_memcell(mem_id: i32) -> Result<(), reqwest::Error> {
     Ok(())
 }
 
+pub async fn update_memcell(mem_id: u32, task: &str) -> Result<(), reqwest::Error> {
+    let url = format!("http://localhost:5000/memcells/{}", mem_id);
+    let payload = serde_json::json!({ "task": task });
+
+    let client = reqwest::Client::new();
+    let res = client
+        .put(&url)
+        .json(&payload)
+        .send()
+        .await?
+        .json::<serde_json::Value>()
+        .await?;
+
+    println!("updated: {:#?}", res);
+    Ok(())
+}
+
 
 #[tokio::main]
 async fn main() {

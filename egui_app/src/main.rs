@@ -3,7 +3,8 @@
 mod app;
 mod client;
 mod ui;
-use app::PaperclipAdjacent;
+mod utils;
+use ui::paperclip_adjacent::PaperclipAdjacent;
 
 
 
