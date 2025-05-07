@@ -20,6 +20,7 @@ Designed for minimalism, portability, and local persistence.
 - [Project Structure](#project-structure)
 - [Build and Deployment](#build-and-deployment)
 - [Notes](#notes)
+- [Documentation & References](#documentation--references)
 
 ## Usage
 
@@ -191,3 +192,16 @@ make clean       # removes build artifacts
 
 - Text entry capped at 160 characters per memcell
 - App runs fully offline and does not require internet for core features
+
+## Documentation & References
+
+### Rust
+- [Egui Demo Library (GitHub)](https://github.com/emilk/egui/tree/master/crates/egui_demo_lib/src/demo)
+- [Egui Official Site](https://www.egui.rs/)
+- [Eframe Documentation](https://docs.rs/eframe/latest/eframe/)
+
+### Python
+- [TinyDB Documentation](https://tinydb.readthedocs.io/en/latest/)
+- [Flask Documentation](https://flask.palletsprojects.com/en/stable/)
+- [Nox Documentation](https://nox.thea.codes/en/stable/)
+- [Pytest Documentation](https://docs.pytest.org/en/stable/contents.html)
