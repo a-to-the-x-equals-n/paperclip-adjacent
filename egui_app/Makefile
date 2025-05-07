@@ -78,8 +78,8 @@ bootstrap: build
 	$(call banner-i,BOOTSTRAPPING CLEAN BUILD)
 	@cargo run
 	$(call banner-o,STRAPPED)
-# --- JENKINS ---
 
+# --- JENKINS ---
 
 jenkins-browser:
 	$(call banner-i,NAVIGATING TO DASHBOARD)

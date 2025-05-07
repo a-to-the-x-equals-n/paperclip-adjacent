@@ -1,5 +1,5 @@
 // use std::sync::Arc; 
-use egui::{TextEdit, RichText};
+use egui::{TextEdit, RichText, TextStyle};
 #[allow(unused_imports)]
 use crate::client::http::{create_memcell, get_all_memcells, delete_memcell, update_memcell, Memcell};
 use crate::utils::auth::{get_evar, fmt_phone_input, clean_phone_number};
@@ -27,14 +27,12 @@ impl eframe::App for PaperclipAdjacent {
                 // --- top panel ---
                 egui::TopBottomPanel::top("top_panel").show(ctx, |ui| {
                     ui.add_space(MD_PAD);
-                    
                     // app title
                     ui.vertical_centered(|ui| {
                         ui.heading(&self.heading);
                         ui.add_space(SM_PAD);
                         ui.label(&self.sub_heading);
                     });
-        
                     ui.add_space(MD_PAD);
                 });
                 
@@ -56,11 +54,14 @@ impl eframe::App for PaperclipAdjacent {
                                 self.phone = formatted; // only assign if it's different to avoid flicker
                             }
                         }
-
                         ui.add_space(SM_PAD);
 
                         // --- 'login' button ---
-                        if ui.button("->").clicked() {
+                        if ui
+                            .add(egui::Button::new(RichText::new("➡")
+                                .color(egui::Color32::WHITE))
+                                .fill(egui::Color32::from_rgb(0, 255, 0)))
+                            .clicked() {
 
                             // validate phone number
                             if let Some(phone_ev) = get_evar("PHONE") {
@@ -79,9 +80,7 @@ impl eframe::App for PaperclipAdjacent {
                                         Ok(memcells) => self.memcells = memcells,
                                         Err(err) => eprintln!("Failed to fetch memcells: {}", err),
                                     }
-        
                                     self.state = AppState::Main;
-
                                 } else {
                                     // --- login failed ---
                                     // unrecognized number
@@ -96,7 +95,6 @@ impl eframe::App for PaperclipAdjacent {
                             }
                         }
                     });
-        
                     ui.add_space(LG_PAD);
                 });
             }
@@ -113,14 +111,14 @@ impl eframe::App for PaperclipAdjacent {
                             ui.heading(&self.heading);
                         });
                     });
-                    ui.add_space(MD_PAD);
+                    ui.add_space(SM_PAD);
                 });
                 
                 // --------------------
                 // --- MEMCELL LIST ---
                 // --------------------
                 egui::CentralPanel::default().show(ctx, |ui| {
-                    ui.add_space(MD_PAD);
+                    ui.add_space(SM_PAD);
 
                     egui::ScrollArea::vertical().show(ui, |ui| {
                         let cell_count = self.memcells.len();
@@ -175,7 +173,7 @@ impl eframe::App for PaperclipAdjacent {
 
                     // --- add memcell button ---
                     ui.vertical_centered(|ui| {
-                        ui.add_space(LG_PAD);
+                        ui.add_space(SM_PAD);
 
                         let mut add_btn = egui::Button::new(RichText::new("➕")
                             .color(egui::Color32::WHITE))
@@ -189,20 +187,21 @@ impl eframe::App for PaperclipAdjacent {
                             self.state = AppState::CreateNew;
                         }
                     });
+                    ui.add_space(SM_PAD);
                 });
 
                 // ----------------------
                 // --- MEMCELL EDITOR ---
                 // ----------------------
                 egui::TopBottomPanel::bottom("task_editor").show(ctx, |ui| {
-                    ui.add_space(MD_PAD);
-                    ui.label("[edit]:");
-                    ui.add_space(SM_PAD);
+                    // ui.add_space(SM_PAD);
+                    ui.label(RichText::new("[edit]:").text_style(TextStyle::Button));
+                    // ui.add_space(SM_PAD);
                     let hint = RichText::new("description...")
                             .italics()
                             .color(egui::Color32::from_rgba_unmultiplied(0xF5, 0x22, 0x77, 80));
 
-                    ui.horizontal_centered(|ui| {
+                    ui.vertical_centered(|ui| {
                         if let Some(index) = self.selected_memcell {
                             let cell = &mut self.memcells[index];
                             let response = ui.add(
@@ -224,10 +223,14 @@ impl eframe::App for PaperclipAdjacent {
                                 }
                             }
                         } else {
+                            let hint = RichText::new("memcell...")
+                                .italics()
+                                .color(egui::Color32::from_rgba_unmultiplied(0xF5, 0x22, 0x77, 80));
+
                             // No memcell selected — show an empty, non-editable field
                             let mut placeholder = String::new();
                             ui.add(egui::TextEdit::multiline(&mut placeholder)
-                                .hint_text("select a memcell to edit...")
+                                .hint_text(hint)
                                 .desired_rows(3)
                                 .interactive(false)
                                 .frame(true),
@@ -251,14 +254,13 @@ impl eframe::App for PaperclipAdjacent {
                             ui.heading(&self.heading);
                         });
                     });
-                    ui.add_space(MD_PAD);
+                    ui.add_space(SM_PAD);
                 });
 
                 // --- center text box panel ---
                 egui::CentralPanel::default().show(ctx, |ui| {
                     ui.add_space(MD_PAD);
                     ui.vertical_centered(|ui| {
-                        ui.heading("Create a new memcell");
                         ui.add_space(SM_PAD);
 
                         if self.creation_error {
@@ -266,53 +268,61 @@ impl eframe::App for PaperclipAdjacent {
                             ui.add_space(SM_PAD);
                         }
 
+                        let hint = RichText::new("new memcell...")
+                                .italics()
+                                .color(egui::Color32::from_rgba_unmultiplied(0xF5, 0x22, 0x77, 80));
+
                         ui.add(egui::TextEdit::multiline(&mut self.new_task)
-                            .hint_text("Enter your memcell task...")
+                            .hint_text(hint)
                             .desired_rows(4)
                             .frame(true),
                         );
                     });
-                });
 
-                // --- bottom action buttons ---
-                egui::TopBottomPanel::bottom("create_buttons").show(ctx, |ui| {
                     ui.add_space(SM_PAD);
-                    ui.horizontal_centered(|ui| {
-                        // --- submit button --- 
-                        if ui
-                            .add(egui::Button::new(RichText::new("✅")
-                                .color(egui::Color32::WHITE))
-                                .fill(egui::Color32::from_rgb(0, 255, 0)))
-                            .clicked()
-                        {
-                            if self.new_task.len() <= 160 {
-                                let task_clone = self.new_task.clone();
-                                let phone = clean_phone_number(&self.phone);
-                                tokio::spawn(async move {
-                                    if let Err(err) = create_memcell(&phone, &task_clone).await {
-                                        eprintln!("Failed to create memcell: {}", err);
-                                    }
-                                });
+                    
+                    // ui.vertical_centered(|ui| {
+                    ui.with_layout(egui::Layout::top_down(egui::Align::Center)
+                            .with_main_align(egui::Align::Center),
+                        |ui| {
+                    //     ui.horizontal_centered(|ui| {
+                            // --- submit button --- 
+                            if ui
+                                .add(egui::Button::new(RichText::new("✅")
+                                    .color(egui::Color32::WHITE))
+                                    .fill(egui::Color32::from_rgb(0, 255, 0)))
+                                .clicked()
+                            {
+                                if self.new_task.trim().len() > 0 && self.new_task.len() <= 160 {
+                                    let task_clone = self.new_task.clone();
+                                    let phone = clean_phone_number(&self.phone);
+                                    tokio::spawn(async move {
+                                        if let Err(err) = create_memcell(&phone, &task_clone).await {
+                                            eprintln!("failed to create memcell: {}", err);
+                                        }
+                                    });
+                                    
+                                    self.creation_error = false;
+                                    self.new_task.clear();
+                                    self.state = AppState::Main;
+                                } else {
+                                    self.creation_error = true;
+                                }
+                            }
+
+                            // --- cancel button ---
+                            if ui
+                                .add(egui::Button::new(RichText::new("❌")
+                                    .color(egui::Color32::WHITE))
+                                    .fill(egui::Color32::from_rgb(255, 0, 0)),)
+                                .clicked()
+                            {
                                 self.creation_error = false;
                                 self.new_task.clear();
                                 self.state = AppState::Main;
-                            } else {
-                                self.creation_error = true;
                             }
-                        }
-
-                        // --- cancel button ---
-                        if ui
-                            .add(egui::Button::new(RichText::new("❌")
-                                .color(egui::Color32::WHITE))
-                                .fill(egui::Color32::from_rgb(255, 0, 0)),)
-                            .clicked()
-                        {
-                            self.creation_error = false;
-                            self.new_task.clear();
-                            self.state = AppState::Main;
-                        }
-                    });
+                        });
+                    // });
                     ui.add_space(SM_PAD);
                 });
             }

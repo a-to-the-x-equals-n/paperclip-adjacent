@@ -66,6 +66,7 @@ impl PaperclipAdjacent {
             (egui::TextStyle::Monospace, egui::FontId::new(16.0, egui::FontFamily::Monospace)),
             (egui::TextStyle::Button, egui::FontId::new(14.0, egui::FontFamily::Proportional)),
             (egui::TextStyle::Small, egui::FontId::new(10.0, egui::FontFamily::Proportional)),
+            (egui::TextStyle::Name("Tiny".into()), egui::FontId::new(8.0, egui::FontFamily::Proportional)),
         ].into();
         cc.egui_ctx.set_style(style);
 
