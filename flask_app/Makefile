@@ -57,7 +57,7 @@ pip:
 
 run:
 	$(call banner-i,STARTING DEV SERVER)
-	@$(PY) -m api --log info --tail 
+	@$(PY) -m api -v
 	$(call banner-o,SERVER STOPPED)
 
 tree:
